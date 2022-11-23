@@ -79,6 +79,9 @@ def get_posts(id):
 
 # CRUD - Certificar la autentificación de la contraseña
 
+#db.session.add(user)
+#db.session.commit()
+
 
 # CRUD - Obtener la lista completa de los usuarios
 @app.route("/list_users", methods=["GET"])
@@ -93,7 +96,7 @@ def get_users():
     return jsonify(all_users)
 
 
-# CRUD Editar perfil del usuario
+# CRUD - Editar perfil del usuario
 @app.route("/edit_user/<int:id>", methods=["PUT"])
 def update_user(id):
     if id is not None:
@@ -115,6 +118,16 @@ def update_user(id):
         }), 400
 
 
+#CRUD - Eliminar la cuenta de un Usuario registrado
+@app.route("/registro/<int:id>", methods=['DELETE'])
+def delete_user(id):
+    if id is not None:
+        user = User.query.filter_by(id=id).first()
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({"msg": "La eliminación de TU CUENTA se ha efectuado"})
+    else:
+        return jsonify({"msg": "TU CUENTA no ha sido encontrada"}), 404
 
 
 
