@@ -61,7 +61,7 @@ def login():
         })
 
 #CRUD - Registrar usuario con cuenta nueva
-@app.route("/registro", methods=["POST"])
+@app.route("/register", methods=["POST"])
 def registro():
     name = request.json.get("name")
     email = request.json.get("email")
