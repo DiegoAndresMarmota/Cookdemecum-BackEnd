@@ -51,7 +51,21 @@ def get_posts(id):
     if all_posts is not None:
         return jsonify(all_posts.serialize())
 
+#Certificar la autentificación de la contraseña
 
+
+
+
+#Obtener la lista completa de los usuarios
+@app.route("/list_users", methods=["GET"])
+@jwt_required()
+def get_users():
+    try:
+         all_users = User.query.all()
+         all_users = list(map(lambda editdata: user.serialize(), all_list_users))
+    except Exception as error:
+         print("Editar error : {error}")
+    return jsonify(all_users)
 
 
 
