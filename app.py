@@ -19,6 +19,13 @@ CORS(app)
 db.init_app(app)
 Migrate(app, db)
 
+
+# Rutas
+@app.route("/")
+def home():
+    return "Hello There, Flask"
+
+
 # Configuración Servidor
 if __name__ == "__main__":
     app.run(port=8080, host="localhost")
