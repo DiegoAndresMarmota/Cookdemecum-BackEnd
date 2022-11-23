@@ -33,27 +33,45 @@ jwt = JWTManager(app)
 def home():
     return "<h1> Hello There </h1>"
 
+
 # CRUD - Registrar un nuevo usuario
-@app.route("/registro", methods=["POST"])
-def registro():
-    name = request.json.get("name")
+@app.route("/login", method=["POST"])
+def login():
     email = request.json.get("email")
     password = request.json.get("password")
-    
-    print(password)
 
-#CRUD - Obtener publicaciones de usuarios
+    found_user = User.query.filter_by(email=email).first
+
+    if found_user is None:
+        return jsonify({
+            "msg": "El USUARIO no ha sido encontrado. Favor, crear un nuevo USUARIO"
+        }), 404
+
+    if bcrypt.check_password_hash(found_user.password, password):
+        access_token = create_access_token(identity=email)
+        return jsonify({
+            "access_token": access_token,
+            "data": found_user.serialize(),
+            "success": True
+        }), 200
+
+    else:
+        return jsonify({
+            "msg": "la contraseña no es válida"
+        })
+
+
+# CRUD - Obtener publicaciones de usuarios
 @app.route("/users/posts", methods=["GET"])
 @jwt_required()
 def get_posts(id):
-    all_posts= User.query.filter_by(id=id).first()
+    all_posts = User.query.filter_by(id=id).first()
     all_posts = list(map(lambda user: user.serialize(), all_posts))
     if all_posts is not None:
         return jsonify(all_posts.serialize())
 
-#CRUD - Certificar la autentificación de la contraseña
 
-
+# CRUD - Certificar la autentificación de la contraseña
 
 
 # CRUD - Obtener la lista completa de los usuarios
@@ -61,13 +79,15 @@ def get_posts(id):
 @jwt_required()
 def get_users():
     try:
-         all_users = User.query.all()
-         all_users = list(map(lambda editdata: user.serialize(), all_list_users))
+        all_users = User.query.all()
+        all_users = list(
+            map(lambda editdata: user.serialize(), all_list_users))
     except Exception as error:
-         print("Editar error : {error}")
+        print("Editar error : {error}")
     return jsonify(all_users)
 
-#CRUD Editar perfil del usuario
+
+# CRUD Editar perfil del usuario
 @app.route("/edit_user/<int:id>", methods=["PUT"])
 def update_user(id):
     if id is not None:
@@ -87,6 +107,7 @@ def update_user(id):
         return jsonify({
             "msg": "El perfil de TU USUARIO no existe o no esta registrado "
         }), 400
+
 
 
 
