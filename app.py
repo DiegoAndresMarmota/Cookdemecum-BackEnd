@@ -3,7 +3,7 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_migrate import Migrate
-from models import db
+from models import db, User
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -25,14 +25,19 @@ Migrate(app, db)
 def home():
     return "Hello There, Flask"
 
+
 @app.route("/user", methods=["POST"])
 def user():
-    username = User()
-    user.name = request.json.get("name")
-    username.email = request.json.get("email")
-    username.passqword = request.json.get("password")
+    user = User()
+    name = request.json.get("name")
+    email = request.json.get("email")
+    password = request.json.get("password")
 
-
+    found_user = User.query.filter_by(email=email).first()
+    if found_user is not None:
+        return jsonify({
+            "msg": "Email is already in use"
+        }), 400
 
 
 # Configuración Servidor
