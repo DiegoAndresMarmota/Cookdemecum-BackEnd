@@ -18,3 +18,7 @@ app.config["ENV"] = "development"
 CORS(app)
 db.init_app(app)
 Migrate(app, db)
+
+# Configuración Servidor
+if __name__ == "__main__":
+    app.run(port=8080, host="localhost")
