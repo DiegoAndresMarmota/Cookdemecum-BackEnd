@@ -4,8 +4,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
+from datetime import datetime
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
-from models import db, User
+from models import db, User, Blog
 
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
@@ -32,6 +33,7 @@ jwt = JWTManager(app)
 def home():
     return "Hello There, Flask"
 
+
 @app.route("/users")
 @jwt_required()
 def users():
@@ -40,6 +42,7 @@ def users():
     return jsonify({
         "data": all_users
     })
+
 
 @app.route("/login", method=["POST"])
 def login():
@@ -52,7 +55,7 @@ def login():
         return jsonify({
             "msg": "User not found. Please create user"
         }), 404
-    
+
     if bcrypt.check_password_hash(found_user.password, password):
         access_token = create_access_token(identity=email)
         return jsonify({
