@@ -129,11 +129,55 @@ def delete_user(id):
     else:
         return jsonify({"msg": "TU CUENTA no ha sido encontrada"}), 404
 
+#CRUD - Eliminación de publicación de usuario
+
+
+#CRUD - Editar publicación de usuario
+
+
+#CRUD - Salir sesión de un usuario logeado
+@app.route("/logout")
+def logout():
+    session.clear()
+    return jsonify({
+        "msg": "SU SESIÓN ha sido cerrada"
+    })
 
 
 
 
-###################################
+
+
+
+
+
+
+
+# Configuración Servidor
+if __name__ == "__main__":
+    app.run(port=8080, host="localhost")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###############EJEMPLOS DE LA CLASE####################
+
+"""
 @app.route("/users")
 @jwt_required()
 def users():
@@ -196,8 +240,4 @@ def user():
         "msg": "success creating user",
         "data": user.serialize()
     }), 200
-
-
-# Configuración Servidor
-if __name__ == "__main__":
-    app.run(port=8080, host="localhost")
+"""
