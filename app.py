@@ -33,11 +33,14 @@ jwt = JWTManager(app)
 def home():
     return "<h1> Hello There </h1>"
 
-
-
-
-
-
+# CRUD Usuario
+@app.route("/registro", methods=["POST"])
+def registro():
+    name = request.json.get("name")
+    email = request.json.get("email")
+    password = request.json.get("password")
+    
+    print(password)
 
 
 
