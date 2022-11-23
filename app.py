@@ -53,7 +53,7 @@ def user():
     db.session.commit()
 
     return jsonify({
-        "msg": "success creating user"
+        "msg": "success creating user",
         "data": user.serialize()
     }), 200
 
