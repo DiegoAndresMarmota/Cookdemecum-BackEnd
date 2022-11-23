@@ -23,7 +23,7 @@ class User(db.Model):
         }
 
 
-class Blog(db.Model):
+"""class Blog(db.Model):
     __tablename__ = "blogs"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50), nullable=False)
@@ -41,6 +41,7 @@ class Blog(db.Model):
             "comentary": self.comentary,
             "user_id": self.user_id
         }
+"""
 
 
 class Post(db.Model):
@@ -49,7 +50,8 @@ class Post(db.Model):
     title = db.Column(db.String(100), nullable=False)
     post = db.Column(db.String(300), nullable=False)
     date = db.Column(db.Date(20), nullable=False)
-    blog_id = db.Column(db.Interger, db.ForeignKey("blogs.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    #blog_id = db.Column(db.Interger, db.ForeignKey("blogs.id"), nullable=False)
 
     def _repr_(self):
         return "<Product %r>" % self.title
@@ -60,5 +62,6 @@ class Post(db.Model):
             "title": self.title,
             "comentary": self.post,
             "date": self.date,
-            "blog_id": self.blog_id
+            "user_id": self.user_id
+            # "blog_id": self.blog_id
         }
