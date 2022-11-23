@@ -42,7 +42,14 @@ def registro():
     
     print(password)
 
-
+#Obtener publicaciones de usuarios
+@app.route("/users/posts", methods=["GET"])
+@jwt_required()
+def get_posts(id):
+    all_posts= User.query.filter_by(id=id).first()
+    all_posts = list(map(lambda user: user.serialize(), all_posts))
+    if all_posts is not None:
+        return jsonify(all_posts.serialize())
 
 
 
