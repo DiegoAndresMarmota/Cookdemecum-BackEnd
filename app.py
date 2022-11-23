@@ -32,6 +32,13 @@ jwt = JWTManager(app)
 def home():
     return "Hello There, Flask"
 
+@app.route("/users")
+def users():
+    all_users = User.query.get_all()
+    all_users = list(map(lambda user: user.serialize(), all_users))
+    return jsonify({
+        "data": all_users
+    })
 
 @app.route("/login", method=["POST"])
 def login():
