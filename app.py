@@ -29,12 +29,12 @@ jwt = JWTManager(app)
 # RUTAS
 
 # Ruta Inicial
-@app.route("/landing", methods=["GET"])
+@app.route("/", methods=["GET"])
 def home():
     return "<h1> Hello There </h1>"
 
 
-# CRUD - Registrar un nuevo usuario
+# CRUD - Iniciar sesión un nuevo usuario ya registrado
 @app.route("/login", method=["POST"])
 def login():
     email = request.json.get("email")
@@ -60,6 +60,12 @@ def login():
             "msg": "la contraseña no es válida"
         })
 
+#CRUD - Registrar usuario con cuenta nueva
+@app.route("/registro", methods=["POST"])
+def registro():
+    name = request.json.get("name")
+    email = request.json.get("email")
+    password = request.json.get("password")
 
 # CRUD - Obtener publicaciones de usuarios
 @app.route("/users/posts", methods=["GET"])
