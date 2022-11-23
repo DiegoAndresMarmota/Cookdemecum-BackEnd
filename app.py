@@ -33,6 +33,7 @@ def home():
     return "Hello There, Flask"
 
 @app.route("/users")
+@jwt_required()
 def users():
     all_users = User.query.get_all()
     all_users = list(map(lambda user: user.serialize(), all_users))
