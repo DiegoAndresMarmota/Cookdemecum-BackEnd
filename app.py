@@ -29,11 +29,11 @@ jwt = JWTManager(app)
 # RUTAS
 
 # Ruta Inicial
-@app.route("/landing")
+@app.route("/landing", methods=["GET"])
 def home():
     return "<h1> Hello There </h1>"
 
-# CRUD Usuario
+# CRUD - Registrar un nuevo usuario
 @app.route("/registro", methods=["POST"])
 def registro():
     name = request.json.get("name")
@@ -42,7 +42,7 @@ def registro():
     
     print(password)
 
-#Obtener publicaciones de usuarios
+#CRUD - Obtener publicaciones de usuarios
 @app.route("/users/posts", methods=["GET"])
 @jwt_required()
 def get_posts(id):
@@ -51,12 +51,12 @@ def get_posts(id):
     if all_posts is not None:
         return jsonify(all_posts.serialize())
 
-#Certificar la autentificación de la contraseña
+#CRUD - Certificar la autentificación de la contraseña
 
 
 
 
-#Obtener la lista completa de los usuarios
+# CRUD - Obtener la lista completa de los usuarios
 @app.route("/list_users", methods=["GET"])
 @jwt_required()
 def get_users():
@@ -67,7 +67,26 @@ def get_users():
          print("Editar error : {error}")
     return jsonify(all_users)
 
+#CRUD Editar perfil del usuario
+@app.route("/edit_user/<int:id>", methods=["PUT"])
+def update_user(id):
+    if id is not None:
+        user = User.query.filter_by(id=id).first()
+        if user is not None:
+            user.name = request.json.get("name")
+            user.password = bcrypt.generate_password_hash(
+                request.json.get("password"))
 
+            db.session.commit()
+            return jsonify(user.serialize()), 200
+        else:
+            return jsonify({
+                "msg": "El perfil de TU USUARIO no ha sido encontrado"
+            }), 404
+    else:
+        return jsonify({
+            "msg": "El perfil de TU USUARIO no existe o no esta registrado "
+        }), 400
 
 
 
