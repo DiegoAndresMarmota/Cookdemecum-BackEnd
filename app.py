@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from models import db, User
 
 
@@ -17,17 +18,45 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + \
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["ENV"] = "development"
 app.config["SECRET_KEY"] = "super_secret_key"
+app.config["JWT_SECRET_KEY"] = "super_jwt_key"
 
 CORS(app)
 db.init_app(app)
 Migrate(app, db)
 bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
 
 
 # Rutas
 @app.route("/")
 def home():
     return "Hello There, Flask"
+
+
+@app.route("/login", method=["POST"])
+def login():
+    email = request.json.get("email")
+    password = request.json.get("password")
+
+    found_user = User.query.filter_by(email=email).first
+
+    if found_user is None:
+        return jsonify({
+            "msg": "User not found. Please create user"
+        }), 404
+    
+    if bcrypt.check_password_hash(found_user.password, password):
+        access_token = create_access_token(identity=email)
+        return jsonify({
+            "access_token": access_token,
+            "data": found_user.serialize(),
+            "success": True
+        }), 200
+
+    else:
+        return jsonify({
+            "msg": "password is invalid"
+        })
 
 
 @app.route("/user", methods=["POST"])
