@@ -9,7 +9,7 @@ class User(db.Model):
     name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(50), nullable=False, unique=False)
-    blog = db.relationship("Blog")
+    post = db.relationship("Post")
 
     def __repr__(self) -> str:
         return "<User %r>" % self.name
@@ -50,11 +50,11 @@ class Post(db.Model):
     title = db.Column(db.String(100), nullable=False)
     post = db.Column(db.String(300), nullable=False)
     date = db.Column(db.Date(20), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     #blog_id = db.Column(db.Interger, db.ForeignKey("blogs.id"), nullable=False)
 
     def _repr_(self):
-        return "<Product %r>" % self.title
+        return "<Post %r>" % self.title
 
     def serialize(self):
         return {
