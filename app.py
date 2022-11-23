@@ -25,6 +25,15 @@ Migrate(app, db)
 def home():
     return "Hello There, Flask"
 
+@app.route("/user", methods=["POST"])
+def user():
+    username = User()
+    user.name = request.json.get("name")
+    username.email = request.json.get("email")
+    username.passqword = request.json.get("password")
+
+
+
 
 # Configuración Servidor
 if __name__ == "__main__":
