@@ -15,25 +15,42 @@ app = Flask(__name__)
 
 # Configuración
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + \
-    os.path.join(BASEDIR, "auth.db")
+    os.path.join(BASEDIR, "app.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["ENV"] = "development"
 app.config["SECRET_KEY"] = "super_secret_key"
 app.config["JWT_SECRET_KEY"] = "super_jwt_key"
-
+app.config["ENV"] = "development"
 CORS(app)
 db.init_app(app)
 Migrate(app, db)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 
+# RUTAS
 
-# Rutas
-@app.route("/")
+# Ruta Inicial
+@app.route("/landing")
 def home():
-    return "Hello There, Flask"
+    return "<h1> Hello There </h1>"
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###################################
 @app.route("/users")
 @jwt_required()
 def users():
