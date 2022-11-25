@@ -28,13 +28,13 @@ jwt = JWTManager(app)
 
 # RUTAS
 
-# Ruta Inicial
+# CRUD - INICIO - 0. Página de Inicio
 @app.route("/", methods=["GET"])
 def home():
     return "<h1> Hello There </h1>"
 
 
-# CRUD - Iniciar sesión un nuevo usuario ya registrado
+# CRUD - USER - 1. Iniciar sesión un nuevo usuario ya registrado
 @app.route("/login", method=["POST"])
 def login():
     email = request.json.get("email")
@@ -60,45 +60,18 @@ def login():
             "msg": "la contraseña no es válida"
         })
 
-#CRUD - Registrar usuario con cuenta nueva
+
+# CRUD - USER - 2. Registrar usuario con cuenta nueva
 @app.route("/register", methods=["POST"])
-def registro():
+def register():
     name = request.json.get("name")
     email = request.json.get("email")
     password = request.json.get("password")
 
-# CRUD - Obtener publicaciones de usuarios
-@app.route("/users/posts", methods=["GET"])
-@jwt_required()
-def get_posts(id):
-    all_posts = User.query.filter_by(id=id).first()
-    all_posts = list(map(lambda user: user.serialize(), all_posts))
-    if all_posts is not None:
-        return jsonify(all_posts.serialize())
 
-
-# CRUD - Certificar la autentificación de la contraseña
-
-#db.session.add(user)
-#db.session.commit()
-
-
-# CRUD - Obtener la lista completa de los usuarios
-@app.route("/list_users", methods=["GET"])
-@jwt_required()
-def get_users():
-    try:
-        all_users = User.query.all()
-        all_users = list(
-            map(lambda editdata: user.serialize(), all_list_users))
-    except Exception as error:
-        print("Editar error : {error}")
-    return jsonify(all_users)
-
-
-# CRUD - Editar perfil del usuario
-@app.route("/edit_user/<int:id>", methods=["PUT"])
-def update_user(id):
+# CRUD - USER - 3. Editar perfil del usuario
+@app.route("/put_user/<int:id>", methods=["PUT"])
+def put_user(id):
     if id is not None:
         user = User.query.filter_by(id=id).first()
         if user is not None:
@@ -116,6 +89,70 @@ def update_user(id):
         return jsonify({
             "msg": "El perfil de TU USUARIO no existe o no esta registrado "
         }), 400
+        
+        
+# CRUD - USER - 4. Subir imagen del usuario
+@app.route("/upload_image/<int:id>", methods=["POST"])
+@jwt_required()
+def upload_image(id):
+    
+    return jsonify({
+        
+    })
+    
+
+# CRUD - USER - 5. Ver perfil personal del usuario
+@app.route("/getUserProfile/<int:id>", methods=["GET"])
+@jwt_required()
+def getUserProfile(id):
+
+    return jsonify({
+
+    })
+    
+    
+# CRUD - USER - 6. Ver lista completa del usuario
+@app.route("/getSoloUser/<int:id>/posts", methods=["GET"])
+@jwt_required()
+def getSoloUser(id):
+    all_posts = User.query.filter_by(id=id).first()
+    all_posts = list(map(lambda user: user.serialize(), all_posts))
+    if all_posts is not None:
+        return jsonify(all_posts.serialize())
+
+
+# CRUD - USER - 7. Ver lista completa de usuarios
+@app.route("/<int:id>", methods=["GET"])
+@jwt_required()
+def getUsers(id):
+    try:
+        all_users = User.query.all()
+        all_users = list(
+            map(lambda editdata: user.serialize(), all_list_users))
+    except Exception as error:
+        print("Editar error : {error}")
+    return jsonify(all_users)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# CRUD - Certificar la autentificación de la contraseña
+
+#db.session.add(user)
+#db.session.commit()
 
 
 #CRUD - Eliminar la cuenta de un Usuario registrado
@@ -135,9 +172,11 @@ def delete_user(id):
 #CRUD - Editar publicación de usuario
 
 
+
 #CRUD - Salir sesión de un usuario logeado
 @app.route("/logout")
 def logout():
+    #logout_user()
     session.clear()
     return jsonify({
         "msg": "SU SESIÓN ha sido cerrada"
