@@ -28,13 +28,13 @@ jwt = JWTManager(app)
 
 # RUTAS
 
-# CRUD - INICIO - 0. Página de Inicio
+# CRUD - INICIO - 1. Página de Inicio.
 @app.route("/", methods=["GET"])
 def home():
     return "<h1> Hello There </h1>"
 
 
-# CRUD - USER - 1. Iniciar sesión un nuevo usuario ya registrado
+# CRUD - USER - 2. Iniciar sesión un nuevo usuario ya registrado.
 @app.route("/login", method=["POST"])
 def login():
     email = request.json.get("email")
@@ -61,7 +61,7 @@ def login():
         })
 
 
-# CRUD - USER - 2. Registrar usuario con cuenta nueva
+# CRUD - USER - 3. Registrar usuario con cuenta nueva.
 @app.route("/register", methods=["POST"])
 def register():
     name = request.json.get("name")
@@ -69,7 +69,7 @@ def register():
     password = request.json.get("password")
 
 
-# CRUD - USER - 3. Editar perfil del usuario
+# CRUD - USER - 4. Editar perfil del usuario.
 @app.route("/put_user/<int:id>", methods=["PUT"])
 def put_user(id):
     if id is not None:
@@ -91,7 +91,7 @@ def put_user(id):
         }), 400
         
         
-# CRUD - USER - 4. Subir imagen del usuario
+# CRUD - USER - 5. Subir imagen del usuario.
 @app.route("/upload_image/<int:id>", methods=["POST"])
 @jwt_required()
 def upload_image(id):
@@ -101,7 +101,7 @@ def upload_image(id):
     })
     
 
-# CRUD - USER - 5. Ver perfil personal del usuario
+# CRUD - USER - 6. Ver perfil personal del usuario.
 @app.route("/getUserProfile/<int:id>", methods=["GET"])
 @jwt_required()
 def getUserProfile(id):
@@ -111,7 +111,7 @@ def getUserProfile(id):
     })
     
     
-# CRUD - USER - 6. Ver lista completa del usuario
+# CRUD - USER - 7. Ver lista completa del usuario.
 @app.route("/getSoloUser/<int:id>/posts", methods=["GET"])
 @jwt_required()
 def getSoloUser(id):
@@ -121,7 +121,7 @@ def getSoloUser(id):
         return jsonify(all_posts.serialize())
 
 
-# CRUD - USER - 7. Ver lista completa de usuarios
+# CRUD - USER - 8. Ver lista completa de usuarios.
 @app.route("/<int:id>", methods=["GET"])
 @jwt_required()
 def getUsers(id):
@@ -134,6 +134,17 @@ def getUsers(id):
     return jsonify(all_users)
 
 
+# CRUD - BLOG - 9. Ver lista completa de publicaciones de los usuarios.
+
+# CRUD - BLOG - 10. Ver lista completa de publicaciones de tu perfil.
+
+# CRUD - BLOG - 11. Comentar una publicación.
+
+# CRUD - BLOG - 12. Editar una publicación.
+
+# CRUD - BLOG - 13. Eliminar una publicación.
+
+# CRUD - BLOG - 14. Comentar con un post a una publicación.
 
 
 
