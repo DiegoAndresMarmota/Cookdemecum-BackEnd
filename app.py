@@ -138,13 +138,13 @@ def getUsers(id):
 
 # CRUD - BLOG - 10. Ver lista completa de publicaciones de tu perfil.
 
-# CRUD - BLOG - 11. Comentar una publicación.
+# CRUD - BLOG - 11. Comentar una publicación. (PENDIENTE)
 
-# CRUD - BLOG - 12. Editar una publicación.
+# CRUD - BLOG - 12. Editar una publicación. (PENDIENTE)
 
-# CRUD - BLOG - 13. Eliminar una publicación.
+# CRUD - BLOG - 13. Eliminar una publicación. (PENDIENTE)
 
-# CRUD - BLOG - 14. Comentar con un post a una publicación.
+# CRUD - BLOG - 14. Comentar con un post a una publicación?
 
 
 
