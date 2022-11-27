@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, g, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
@@ -7,6 +7,8 @@ from flask_migrate import Migrate
 from datetime import datetime
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from models import db, User, Blog
+from werkzeug.exceptions import abort
+from models import Post
 
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
@@ -138,7 +140,46 @@ def getUsers(id):
 
 # CRUD - BLOG - 10. Ver lista completa de publicaciones de tu perfil.
 
-# CRUD - BLOG - 11. Comentar una publicación. (PENDIENTE)
+# CRUD - BLOG - 11. Comentar una publicación.
+@app.route('/addBlog', methods=('GET', 'POST'))
+@jwt_required
+def addBlog():
+    if request.method == 'POST':
+        title = request.form.get('title')
+        post = request.form.get('comentary')
+        date = request.form.get('date')
+
+        post = Post(g.user.id, title, post, date)
+
+        error = None
+        if not title:
+            error = 'Se requiere un TITULO para esta publicación'
+
+        if error is not None:
+            flash(error)
+            
+        else:
+            db.session.add(post)
+            db.session.commit()
+            return post
+
+        flash(error)
+
+    return jsonify({
+        "msg": "El post de TU USUARIO ha sido encontrado publicada"
+    }), 200
+
+
+def get_post(id, check_author=True):
+    post = Post.query.get(id)
+
+    if post is None:
+        abort(404, f'La {id} de la publicación NO EXIST.')
+
+    if check_author and post.title != g.user.id:
+        abort(404)
+
+    return post
 
 # CRUD - BLOG - 12. Editar una publicación. (PENDIENTE)
 
