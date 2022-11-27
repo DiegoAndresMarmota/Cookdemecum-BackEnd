@@ -212,7 +212,17 @@ def editBlog(id):
         "msg": "La edición de este POST ha sido publicada"
     }), 200
 
-# CRUD - BLOG - 13. Eliminar una publicación. (PENDIENTE)
+# CRUD - BLOG - 13. Eliminar una publicación.
+@app.route('/deletePost/<int:id>')
+@jwt_required
+def deletePost(id):
+    post = get_post(id)
+    db.session.delete(post)
+    db.session.commit()
+
+    return jsonify({
+        "msg": "Se elimino la PUBLICACIÓN de forma satisfactoria"
+    }), 200
 
 # CRUD - BLOG - 14. Comentar con un post a una publicación?
 
