@@ -181,7 +181,36 @@ def get_post(id, check_author=True):
 
     return post
 
-# CRUD - BLOG - 12. Editar una publicación. (PENDIENTE)
+
+# CRUD - BLOG - 12. Editar una publicación.
+@app.route('/editBlog/<int:id>', methods=('GET', 'POST'))
+@jwt_required
+def editBlog(id):
+
+    post = get_post(id)
+
+    if request.method == 'POST':
+        post.title = request.form.get('title')
+        post.post = request.form.get('post')
+        post.date = request.form.get('date')
+        
+
+        error = None
+        if not post.title:
+            error = 'Se requiere un TITULO para esta publicación'
+
+        if error is not None:
+            flash(error)
+        else:
+            db.session.add(post)
+            db.session.commit()
+            return post.post
+
+        flash(error)
+
+    return jsonify({
+        "msg": "La edición de este POST ha sido publicada"
+    }), 200
 
 # CRUD - BLOG - 13. Eliminar una publicación. (PENDIENTE)
 
