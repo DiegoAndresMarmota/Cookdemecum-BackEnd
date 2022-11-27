@@ -137,6 +137,14 @@ def getUsers(id):
 
 
 # CRUD - BLOG - 9. Ver lista completa de publicaciones de los usuarios.
+@app.route("/users", methods=["GET"])
+@jwt_required()
+def users():
+    all_users = User.query.get_all()
+    all_users = list(map(lambda user: user.serialize(), all_users))
+    return jsonify({
+        "data": all_users
+    })
 
 # CRUD - BLOG - 10. Ver lista completa de publicaciones de tu perfil.
 
@@ -223,8 +231,6 @@ def deletePost(id):
     return jsonify({
         "msg": "Se elimino la PUBLICACIÓN de forma satisfactoria"
     }), 200
-
-# CRUD - BLOG - 14. Comentar con un post a una publicación?
 
 
 # CRUD - USER - 1X. Eliminar la cuenta de un Usuario registrado
