@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, request, g, flash
+from flask import Flask, jsonify, request, g, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
@@ -228,7 +228,7 @@ def deletePost(id):
 
 
 # CRUD - USER - 1X. Eliminar la cuenta de un Usuario registrado
-@app.route("/register/<int:id>", methods=['DELETE'])
+@app.route('/register/<int:id>', methods=['DELETE'])
 def delete_user(id):
     if id is not None:
         user = User.query.filter_by(id=id).first()
@@ -238,6 +238,14 @@ def delete_user(id):
     else:
         return jsonify({"msg": "TU CUENTA no ha sido encontrada"}), 404
 
+
+# CRUD - USER - 2X. Salir sesión de un usuario logeado
+@app.route('/logout')
+def logout():
+    session.clear()
+    return jsonify({
+        "msg": "SU SESIÓN ha sido cerrada"
+    })
 
 
 
@@ -256,32 +264,6 @@ def delete_user(id):
 
 #db.session.add(user)
 #db.session.commit()
-
-
-
-#CRUD - Eliminación de publicación de usuario
-
-
-#CRUD - Editar publicación de usuario
-
-
-
-#CRUD - Salir sesión de un usuario logeado
-@app.route("/logout")
-def logout():
-    #logout_user()
-    session.clear()
-    return jsonify({
-        "msg": "SU SESIÓN ha sido cerrada"
-    })
-
-
-
-
-
-
-
-
 
 
 
