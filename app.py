@@ -248,23 +248,33 @@ def logout():
     })
 
 
+# CRUD - USER - 3X. Certificar la autentificación de la contraseña
+@app.route("/user", methods=["POST"])
+def user():
+    user = User()
+    name = request.json.get("name")
+    email = request.json.get("email")
+    password = request.json.get("password")
 
+    found_user = User.query.filter_by(email=email).first()
+    print(found_user)
+    if found_user is not None:
+        return jsonify({
+            "msg": "El email ya HA SIDO registrado"
+        }), 400
 
+    user.email = email
+    user.name = name
+    password_hash = bcrypt.generate_password_hash(password)
+    user.password = password_hash
 
+    db.session.add(user)
+    db.session.commit()
 
-
-
-
-
-
-
-
-
-# CRUD - Certificar la autentificación de la contraseña
-
-#db.session.add(user)
-#db.session.commit()
-
+    return jsonify({
+        "msg": "Creación de USUARIO se ha realizado de forma satisfactoria",
+        "data": user.serialize()
+    }), 200
 
 
 # Configuración Servidor
@@ -326,32 +336,4 @@ def login():
         return jsonify({
             "msg": "password is invalid"
         })
-
-
-@app.route("/user", methods=["POST"])
-def user():
-    user = User()
-    name = request.json.get("name")
-    email = request.json.get("email")
-    password = request.json.get("password")
-
-    found_user = User.query.filter_by(email=email).first()
-    print(found_user)
-    if found_user is not None:
-        return jsonify({
-            "msg": "Email is already in use"
-        }), 400
-
-    user.email = email
-    user.name = name
-    password_hash = bcrypt.generate_password_hash(password)
-    user.password = password_hash
-
-    db.session.add(user)
-    db.session.commit()
-
-    return jsonify({
-        "msg": "success creating user",
-        "data": user.serialize()
-    }), 200
 """
