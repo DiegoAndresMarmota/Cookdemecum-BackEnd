@@ -141,7 +141,7 @@ def getUsers(id):
 # CRUD - BLOG - 10. Ver lista completa de publicaciones de tu perfil.
 
 # CRUD - BLOG - 11. Comentar una publicación.
-@app.route('/addBlog', methods=('GET', 'POST'))
+@app.route('/addBlog/<int:id>', methods=('GET', 'POST'))
 @jwt_required
 def addBlog():
     if request.method == 'POST':
@@ -188,6 +188,18 @@ def get_post(id, check_author=True):
 # CRUD - BLOG - 14. Comentar con un post a una publicación?
 
 
+# CRUD - USER - 1X. Eliminar la cuenta de un Usuario registrado
+@app.route("/register/<int:id>", methods=['DELETE'])
+def delete_user(id):
+    if id is not None:
+        user = User.query.filter_by(id=id).first()
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({"msg": "La eliminación de TU CUENTA se ha efectuado"})
+    else:
+        return jsonify({"msg": "TU CUENTA no ha sido encontrada"}), 404
+
+
 
 
 
@@ -207,16 +219,6 @@ def get_post(id, check_author=True):
 #db.session.commit()
 
 
-#CRUD - Eliminar la cuenta de un Usuario registrado
-@app.route("/registro/<int:id>", methods=['DELETE'])
-def delete_user(id):
-    if id is not None:
-        user = User.query.filter_by(id=id).first()
-        db.session.delete(user)
-        db.session.commit()
-        return jsonify({"msg": "La eliminación de TU CUENTA se ha efectuado"})
-    else:
-        return jsonify({"msg": "TU CUENTA no ha sido encontrada"}), 404
 
 #CRUD - Eliminación de publicación de usuario
 
