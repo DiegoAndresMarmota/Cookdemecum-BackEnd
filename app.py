@@ -59,7 +59,7 @@ def login():
 
     else:
         return jsonify({
-            "msg": "la contraseña no es válida"
+            "msg": "La contraseña ES VÁLIDA"
         })
 
 
@@ -296,60 +296,4 @@ def user():
 # Configuración Servidor
 if __name__ == "__main__":
     app.run(port=8080, host="localhost")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-###############EJEMPLOS DE LA CLASE####################
-
-"""
-@app.route("/users")
-@jwt_required()
-def users():
-    all_users = User.query.get_all()
-    all_users = list(map(lambda user: user.serialize(), all_users))
-    return jsonify({
-        "data": all_users
-    })
-
-
-@app.route("/login", method=["POST"])
-def login():
-    email = request.json.get("email")
-    password = request.json.get("password")
-
-    found_user = User.query.filter_by(email=email).first
-
-    if found_user is None:
-        return jsonify({
-            "msg": "User not found. Please create user"
-        }), 404
-
-    if bcrypt.check_password_hash(found_user.password, password):
-        access_token = create_access_token(identity=email)
-        return jsonify({
-            "access_token": access_token,
-            "data": found_user.serialize(),
-            "success": True
-        }), 200
-
-    else:
-        return jsonify({
-            "msg": "password is invalid"
-        })
-"""
+    
