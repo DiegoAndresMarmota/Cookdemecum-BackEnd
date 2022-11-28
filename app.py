@@ -130,7 +130,7 @@ def getUsers(id):
     try:
         all_users = User.query.all()
         all_users = list(
-            map(lambda editdata: user.serialize(), all_list_users))
+            map(lambda editdata: user.serialize(), all_users))
     except Exception as error:
         print("Editar error : {error}")
     return jsonify(all_users)
