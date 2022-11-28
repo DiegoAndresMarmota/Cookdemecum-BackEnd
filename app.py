@@ -146,7 +146,16 @@ def users():
         "data": all_users
     })
 
+
 # CRUD - BLOG - 10. Ver lista completa de publicaciones de tu perfil.
+@app.route("/soloBlog/<int:id>/", methods=["GET"])
+@jwt_required()
+def soloBlogs():
+    all_blogs = Post.query.get_all()
+    all_blogs = list(map(lambda post: post.serialize(), all_blogs))
+    return jsonify({
+        "data": all_blogs
+    })
 
 # CRUD - BLOG - 11. Comentar una publicación.
 @app.route('/addBlog/<int:id>', methods=('GET', 'POST'))
@@ -219,6 +228,7 @@ def editBlog(id):
     return jsonify({
         "msg": "La edición de este POST ha sido publicada"
     }), 200
+
 
 # CRUD - BLOG - 13. Eliminar una publicación.
 @app.route('/deletePost/<int:id>')
