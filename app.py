@@ -72,8 +72,8 @@ def register():
 
 
 # CRUD - USER - 4. Editar perfil del usuario.
-@app.route("/put_user/<int:id>", methods=["PUT"])
-def put_user(id):
+@app.route("/putUser/<int:id>", methods=["PUT"])
+def putUser(id):
     if id is not None:
         user = User.query.filter_by(id=id).first()
         if user is not None:
@@ -96,7 +96,7 @@ def put_user(id):
 # CRUD - USER - 5. Subir imagen del usuario.
 @app.route("/upload_image/<int:id>", methods=["POST"])
 @jwt_required()
-def upload_image(id):
+def uploadImage(id):
     
     return jsonify({
         
@@ -124,7 +124,7 @@ def getSoloUser(id):
 
 
 # CRUD - USER - 8. Ver lista completa de usuarios.
-@app.route("/<int:id>", methods=["GET"])
+@app.route("/getUsers", methods=["GET"])
 @jwt_required()
 def getUsers(id):
     try:
@@ -137,9 +137,9 @@ def getUsers(id):
 
 
 # CRUD - BLOG - 9. Ver lista completa de publicaciones de los usuarios.
-@app.route("/users", methods=["GET"])
+@app.route("/blogUsers", methods=["GET"])
 @jwt_required()
-def users():
+def blogUsers():
     all_users = User.query.get_all()
     all_users = list(map(lambda user: user.serialize(), all_users))
     return jsonify({
@@ -244,8 +244,9 @@ def deletePost(id):
 
 
 # CRUD - USER - 1X. Eliminar la cuenta de un Usuario registrado
-@app.route('/register/<int:id>', methods=['DELETE'])
-def delete_user(id):
+@app.route('/deleteUser/<int:id>', methods=['DELETE'])
+@jwt_required
+def deleteUser(id):
     if id is not None:
         user = User.query.filter_by(id=id).first()
         db.session.delete(user)
@@ -257,6 +258,7 @@ def delete_user(id):
 
 # CRUD - USER - 2X. Salir sesión de un usuario logeado
 @app.route('/logout')
+@jwt_required
 def logout():
     session.clear()
     return jsonify({
