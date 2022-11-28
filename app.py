@@ -135,7 +135,7 @@ def getUsers(id):
         print("Editar error : {error}")
     return jsonify(all_users)
 
-
+"""
 # CRUD - BLOG - 9. Ver lista completa de publicaciones de los usuarios.
 @app.route("/blogUsers", methods=["GET"])
 @jwt_required()
@@ -145,7 +145,7 @@ def blogUsers():
     return jsonify({
         "data": all_users
     })
-
+"""
 
 # CRUD - BLOG - 10. Ver lista completa de publicaciones de tu perfil.
 @app.route("/soloBlog/<int:id>/", methods=["GET"])
