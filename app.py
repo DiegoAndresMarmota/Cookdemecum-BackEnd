@@ -73,9 +73,19 @@ def login():
 # CRUD - USER - 3. Registrar usuario con cuenta nueva.
 @app.route("/register", methods=["POST"])
 def register():
-    name = request.json.get("name")
-    email = request.json.get("email")
-    password = request.json.get("password")
+    # if request.method == 'POST':
+        name = request.json.get("name")
+        email = request.json.get("email")
+        password = request.json.get("password")
+        """
+        new_contact = User(name, email, password)
+
+        db.session.add(new_contact)
+        db.session.commit()
+
+        flash('Usuario registrado satisfactoriamente')
+        """
+        return jsonify({"msg": "Usuario registrado satisfactoriamente."})
 
 
 # CRUD - USER - 4. Editar perfil del usuario.
