@@ -6,12 +6,13 @@ from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
 from datetime import datetime
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
-from models import db, User, Blog
+from models import db, User, Post
 from werkzeug.exceptions import abort
-from models import Post
+from werkzeug.utils import secure_filename
 
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 app = Flask(__name__)
 
@@ -22,11 +23,17 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "super_secret_key"
 app.config["JWT_SECRET_KEY"] = "super_jwt_key"
 app.config["ENV"] = "development"
+app.config["UPLOAD_FOLDER"] = os.path.join(BASEDIR, "images")
+
 CORS(app)
 db.init_app(app)
 Migrate(app, db)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # RUTAS
 
@@ -91,17 +98,21 @@ def putUser(id):
         return jsonify({
             "msg": "El perfil de TU USUARIO no existe o no esta registrado "
         }), 400
-        
-        
+
+
 # CRUD - USER - 5. Subir imagen del usuario.
 @app.route("/upload_image/<int:id>", methods=["POST"])
 @jwt_required()
 def uploadImage(id):
-    
-    return jsonify({
+    if "file" not in request.files:
+        return jsonify({"msg":"La consulta de 'File' no ha sido solicitada."})
+    file = request.files["file"]
+    if file.filename == "":
+        return jsonify({"msg":"El archivo 'file' no contiene un nombre."})
+    filename = secure_filename(file.filename)
+    file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+    return jsonify({"msg":"La imagen ha sido guardada."})
         
-    })
-    
 
 # CRUD - USER - 6. Ver perfil personal del usuario.
 @app.route("/getUserProfile/<int:id>", methods=["GET"])
@@ -111,8 +122,8 @@ def getUserProfile(id):
     return jsonify({
 
     })
-    
-    
+
+
 # CRUD - USER - 7. Ver lista completa del usuario.
 @app.route("/getSoloUser/<int:id>/posts", methods=["GET"])
 @jwt_required()
@@ -135,6 +146,7 @@ def getUsers(id):
         print("Editar error : {error}")
     return jsonify(all_users)
 
+
 """
 # CRUD - BLOG - 9. Ver lista completa de publicaciones de los usuarios.
 @app.route("/blogUsers", methods=["GET"])
@@ -148,6 +160,8 @@ def blogUsers():
 """
 
 # CRUD - BLOG - 10. Ver lista completa de publicaciones de tu perfil.
+
+
 @app.route("/soloBlog/<int:id>/", methods=["GET"])
 @jwt_required()
 def soloBlogs():
@@ -158,6 +172,8 @@ def soloBlogs():
     })
 
 # CRUD - BLOG - 11. Comentar una publicación.
+
+
 @app.route('/addBlog/<int:id>', methods=('GET', 'POST'))
 @jwt_required
 def addBlog():
@@ -174,7 +190,7 @@ def addBlog():
 
         if error is not None:
             flash(error)
-            
+
         else:
             db.session.add(post)
             db.session.commit()
@@ -210,7 +226,6 @@ def editBlog(id):
         post.title = request.form.get('title')
         post.post = request.form.get('post')
         post.date = request.form.get('date')
-        
 
         error = None
         if not post.title:
@@ -298,4 +313,3 @@ def user():
 # Configuración Servidor
 if __name__ == "__main__":
     app.run(port=8080, host="localhost")
-    
