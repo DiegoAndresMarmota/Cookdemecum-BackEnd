@@ -270,7 +270,7 @@ def deletePost(id):
     }), 200
 
 
-# CRUD - USER - 1X. Eliminar la cuenta de un Usuario registrado
+# CRUD - USER - 14. Eliminar la cuenta de un Usuario registrado
 @app.route('/deleteUser/<int:id>', methods=['DELETE'])
 @jwt_required
 def deleteUser(id):
@@ -283,7 +283,7 @@ def deleteUser(id):
         return jsonify({"msg": "TU CUENTA no ha sido encontrada"}), 404
 
 
-# CRUD - USER - 2X. Salir sesión de un usuario logeado
+# CRUD - USER - 15. Salir sesión de un usuario logeado
 @app.route('/logout')
 @jwt_required
 def logout():
@@ -293,7 +293,7 @@ def logout():
     })
 
 
-# CRUD - USER - 3X. Certificar la autentificación de la contraseña
+# CRUD - USER - 16. Certificar la autentificación de la contraseña
 @app.route("/user", methods=["POST"])
 def user():
     user = User()
