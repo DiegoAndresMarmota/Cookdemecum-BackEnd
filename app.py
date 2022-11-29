@@ -118,10 +118,9 @@ def uploadImage(id):
 @app.route("/getUserProfile/<int:id>", methods=["GET"])
 @jwt_required()
 def getUserProfile(id):
-
-    return jsonify({
-
-    })
+    userProfile = userProfile.query.filter_by(id=id).first()
+    userProfile = list(map(lambda user: user.serialize(), userProfile))
+    return jsonify(userProfile.serialize), 200
 
 
 # CRUD - USER - 7. Ver lista completa del usuario.
