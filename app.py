@@ -89,7 +89,7 @@ def register():
 
 
 # CRUD - USER - 4. Editar perfil del usuario.
-@app.route("/putUser/<int:id>", methods=["PUT"])
+@app.route("/editarProfile/<int:id>", methods=["PUT"])
 def putUser(id):
     if id is not None:
         user = User.query.filter_by(id=id).first()
@@ -125,13 +125,20 @@ def uploadImage(id):
         
 
 # CRUD - USER - 6. Ver perfil personal del usuario.
-@app.route("/getUserProfile/<int:id>", methods=["GET"])
+@app.route("/miPerfil", methods=["GET"])
 @jwt_required()
-def getUserProfile(id):
+def getUserProfile():
+    email = get_jwt_identity()
+    user = User.query.filter_by(email=email).first()
+    return jsonify({
+        "user": user.serialize()
+    }), 200
+    
+    """
     userProfile = userProfile.query.filter_by(id=id).first()
     userProfile = list(map(lambda user: user.serialize(), userProfile))
     return jsonify(userProfile.serialize), 200
-
+    """
 
 # CRUD - USER - 7. Ver lista completa del usuario.
 @app.route("/getSoloUser/<int:id>/posts", methods=["GET"])
@@ -169,8 +176,6 @@ def blogUsers():
 """
 
 # CRUD - BLOG - 10. Ver lista completa de publicaciones de tu perfil.
-
-
 @app.route("/soloBlog/<int:id>/", methods=["GET"])
 @jwt_required()
 def soloBlogs():
@@ -181,8 +186,6 @@ def soloBlogs():
     })
 
 # CRUD - BLOG - 11. Comentar una publicación.
-
-
 @app.route('/addBlog/<int:id>', methods=('GET', 'POST'))
 @jwt_required
 def addBlog():
