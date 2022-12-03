@@ -40,6 +40,7 @@ def allowed_file(filename):
 
 # CRUD - INICIO - 1. Página de Inicio.
 
+
 @app.route("/", methods=["GET"])
 def home():
     return "<h1> Hello There </h1>"
@@ -51,24 +52,25 @@ def login():
     email = request.json.get("email")
     password = request.json.get("password")
 
-    found_user = User.query.filter_by(email=email).first
+    found_user = User.query.filter_by(email=email).first()
 
     if found_user is None:
         return jsonify({
             "msg": "El USUARIO no ha sido encontrado. Favor, crear un nuevo USUARIO"
         }), 404
 
-    if bcrypt.check_password_hash(found_user.password, password):
-        access_token = create_access_token(identity=email)
-        return jsonify({
-            "access_token": access_token,
-            "data": found_user.serialize(),
-            "success": True
-        }), 200
     else:
-        return jsonify({
-            "msg": "La contraseña ES VÁLIDA"
-        })
+        if bcrypt.check_password_hash(found_user.password, password):
+            access_token = create_access_token(identity=email)
+            return jsonify({
+                "access_token": access_token,
+                "data": found_user.serialize(),
+                "success": True
+            }), 200
+        else:
+            return jsonify({
+                "msg": "La contraseña ES VÁLIDA"
+            })
 
 
 # CRUD - USER - 3. Registrar usuario con cuenta nueva.
@@ -77,15 +79,18 @@ def register():
     # if request.method == 'POST':
     name = request.json.get("name")
     email = request.json.get("email")
-    password = request.json.get("password")
-    """
-        new_contact = User(name, email, password)
 
-        db.session.add(new_contact)
-        db.session.commit()
+    new_contact = User()
+    new_contact.name = name
+    new_contact.email = email
+    new_contact.password = bcrypt.generate_password_hash(
+        request.json.get("password"))
 
-        flash('Usuario registrado satisfactoriamente')
-        """
+    db.session.add(new_contact)
+    db.session.commit()
+
+    flash('Usuario registrado satisfactoriamente')
+
     return jsonify({"msg": "Usuario registrado satisfactoriamente."})
 
 
@@ -143,6 +148,8 @@ def getUserProfile():
     """
 
 # CRUD - USER - 7. Ver lista completa de publicaciones del usuario.
+
+
 @app.route("/getSoloUser/<int:id>/posts", methods=["GET"])
 @jwt_required()
 def getSoloUser(id):
@@ -178,6 +185,8 @@ def blogUsers():
 """
 
 # CRUD - BLOG - 10. Ver lista completa de publicaciones de tu perfil.
+
+
 @app.route("/soloBlog/<int:id>", methods=["GET"])
 @jwt_required()
 def soloBlogs():
