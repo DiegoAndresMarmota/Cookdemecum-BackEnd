@@ -10,7 +10,7 @@ class User(db.Model):
     name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(50), nullable=False, unique=False)
-    post = db.relationship("Post")
+    #post = db.relationship("Post")
 
     def __repr__(self) -> str:
         return "<User %r>" % self.name
@@ -20,7 +20,7 @@ class User(db.Model):
             "id": self.id,
             "username": self.name,
             "email": self.email,
-            "password": self.password,
+            #"password": self.password,
         }
 
 
@@ -51,8 +51,9 @@ class Post(db.Model):
     title = db.Column(db.String(100), nullable=False)
     post = db.Column(db.String(300), nullable=False)
     date = db.Column(db.DateTime(20), nullable=False, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     #blog_id = db.Column(db.Interger, db.ForeignKey("blogs.id"), nullable=False)
+    user = db.relationship("User")
 
     def _repr_(self):
         return "<Post %r>" % self.title
