@@ -31,6 +31,7 @@ Migrate(app, db)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -38,13 +39,14 @@ def allowed_file(filename):
 # RUTAS
 
 # CRUD - INICIO - 1. Página de Inicio.
+
 @app.route("/", methods=["GET"])
 def home():
     return "<h1> Hello There </h1>"
 
 
 # CRUD - USER - 2. Iniciar sesión un nuevo usuario ya registrado.
-@app.route("/login", method=["POST"])
+@app.route("/login", methods=["POST"])
 def login():
     email = request.json.get("email")
     password = request.json.get("password")
@@ -63,7 +65,6 @@ def login():
             "data": found_user.serialize(),
             "success": True
         }), 200
-
     else:
         return jsonify({
             "msg": "La contraseña ES VÁLIDA"
@@ -74,10 +75,10 @@ def login():
 @app.route("/register", methods=["POST"])
 def register():
     # if request.method == 'POST':
-        name = request.json.get("name")
-        email = request.json.get("email")
-        password = request.json.get("password")
-        """
+    name = request.json.get("name")
+    email = request.json.get("email")
+    password = request.json.get("password")
+    """
         new_contact = User(name, email, password)
 
         db.session.add(new_contact)
@@ -85,12 +86,13 @@ def register():
 
         flash('Usuario registrado satisfactoriamente')
         """
-        return jsonify({"msg": "Usuario registrado satisfactoriamente."})
+    return jsonify({"msg": "Usuario registrado satisfactoriamente."})
 
 
 # CRUD - USER - 4. Editar perfil del usuario.
-@app.route("/editarProfile/<int:id>", methods=["PUT"])
-def putUser(id):
+@app.route("/editProfile/<int:id>", methods=["PUT"])
+@jwt_required()
+def editProfile(id):
     if id is not None:
         user = User.query.filter_by(id=id).first()
         if user is not None:
@@ -115,14 +117,14 @@ def putUser(id):
 @jwt_required()
 def uploadImage(id):
     if "file" not in request.files:
-        return jsonify({"msg":"La consulta de 'File' no ha sido solicitada."})
+        return jsonify({"msg": "La consulta de 'File' no ha sido solicitada."})
     file = request.files["file"]
     if file.filename == "":
-        return jsonify({"msg":"El archivo 'file' no contiene un nombre."})
+        return jsonify({"msg": "El archivo 'file' no contiene un nombre."})
     filename = secure_filename(file.filename)
     file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-    return jsonify({"msg":"La imagen ha sido guardada."})
-        
+    return jsonify({"msg": "La imagen ha sido guardada."})
+
 
 # CRUD - USER - 6. Ver perfil personal del usuario.
 @app.route("/miPerfil", methods=["GET"])
@@ -133,14 +135,14 @@ def getUserProfile():
     return jsonify({
         "user": user.serialize()
     }), 200
-    
+
     """
     userProfile = userProfile.query.filter_by(id=id).first()
     userProfile = list(map(lambda user: user.serialize(), userProfile))
     return jsonify(userProfile.serialize), 200
     """
 
-# CRUD - USER - 7. Ver lista completa del usuario.
+# CRUD - USER - 7. Ver lista completa de publicaciones del usuario.
 @app.route("/getSoloUser/<int:id>/posts", methods=["GET"])
 @jwt_required()
 def getSoloUser(id):
@@ -176,7 +178,7 @@ def blogUsers():
 """
 
 # CRUD - BLOG - 10. Ver lista completa de publicaciones de tu perfil.
-@app.route("/soloBlog/<int:id>/", methods=["GET"])
+@app.route("/soloBlog/<int:id>", methods=["GET"])
 @jwt_required()
 def soloBlogs():
     all_blogs = Post.query.get_all()
@@ -186,8 +188,10 @@ def soloBlogs():
     })
 
 # CRUD - BLOG - 11. Comentar una publicación.
-@app.route('/addBlog/<int:id>', methods=('GET', 'POST'))
-@jwt_required
+
+
+@app.route("/addBlog/<int:id>", methods=["GET", "POST"])
+@jwt_required()
 def addBlog():
     if request.method == 'POST':
         title = request.form.get('title')
@@ -228,8 +232,8 @@ def get_post(id, check_author=True):
 
 
 # CRUD - BLOG - 12. Editar una publicación.
-@app.route('/editBlog/<int:id>', methods=('GET', 'POST'))
-@jwt_required
+@app.route("/editBlog/<int:id>", methods=["GET", "POST"])
+@jwt_required()
 def editBlog(id):
 
     post = get_post(id)
@@ -258,8 +262,8 @@ def editBlog(id):
 
 
 # CRUD - BLOG - 13. Eliminar una publicación.
-@app.route('/deletePost/<int:id>')
-@jwt_required
+@app.route("/deletePost/<int:id>", methods=["DELETE"])
+@jwt_required()
 def deletePost(id):
     post = get_post(id)
     db.session.delete(post)
@@ -271,8 +275,8 @@ def deletePost(id):
 
 
 # CRUD - USER - 14. Eliminar la cuenta de un Usuario registrado
-@app.route('/deleteUser/<int:id>', methods=['DELETE'])
-@jwt_required
+@app.route("/deleteUser/<int:id>", methods=["DELETE"])
+@jwt_required()
 def deleteUser(id):
     if id is not None:
         user = User.query.filter_by(id=id).first()
@@ -284,8 +288,8 @@ def deleteUser(id):
 
 
 # CRUD - USER - 15. Salir sesión de un usuario logeado
-@app.route('/logout')
-@jwt_required
+@app.route("/logout")
+@jwt_required()
 def logout():
     session.clear()
     return jsonify({
