@@ -34,7 +34,7 @@ jwt = JWTManager(app)
 
 def allowed_file(filename):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # RUTAS
 
@@ -153,11 +153,11 @@ def getUserProfile():
 # CRUD - USER - 7. Ver lista completa de publicaciones del usuario.
 
 
-@app.route("/getSoloUser/<int:id>/posts", methods=["GET"])
+@app.route("/getSoloUser/<int:id>", methods=["GET"])  # posts
 @jwt_required()
 def getSoloUser(id):
-    all_posts = User.query.filter_by(id=id).first()
-    all_posts = list(map(lambda user: user.serialize(), all_posts))
+    all_posts = Post.query.filter_by(id=id).first()
+    all_posts = list(map(lambda post: post.serialize(), all_posts))
     if all_posts is not None:
         return jsonify(all_posts.serialize())
 
@@ -244,13 +244,13 @@ def get_post(id, check_author=True):
 
 
 # CRUD - BLOG - 12. Editar una publicación.
-@app.route("/editBlog/<int:id>", methods=["GET", "POST"])
+@app.route("/editBlog/<int:id>", methods=["GET", "PUT"])
 @jwt_required()
 def editBlog(id):
 
     post = get_post(id)
 
-    if request.method == 'POST':
+    if request.method == 'PUT':
         post.title = request.form.get('title')
         post.post = request.form.get('post')
         post.date = request.form.get('date')
@@ -300,7 +300,7 @@ def deleteUser(id):
 
 
 # CRUD - USER - 15. Salir sesión de un usuario logeado
-@app.route("/logout")
+@app.route("/logout", methods=["GET"])
 @jwt_required()
 def logout():
     session.clear()
