@@ -95,9 +95,12 @@ def register():
 
 
 # CRUD - USER - 4. Editar perfil del usuario.
-@app.route("/editProfile/<int:id>", methods=["PUT"])
+# @app.route("/editProfile/<int:id>", methods=["PUT"])
+@app.route("/editProfile", methods=["PUT"])
 @jwt_required()
-def editProfile(id):
+def editProfile():
+    # Aquí se leen los parametros del request y se accede al query params id
+    id = request.args.get('id')
     if id is not None:
         user = User.query.filter_by(id=id).first()
         if user is not None:
