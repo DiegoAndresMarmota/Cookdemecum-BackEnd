@@ -6,9 +6,10 @@ from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
 from datetime import datetime
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
-from models import db, User, Post
+from models import db, User, Blog, Comment
 from werkzeug.exceptions import abort
 from werkzeug.utils import secure_filename
+from flask_serialize import FlaskSerialize ####
 
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
@@ -39,11 +40,9 @@ def allowed_file(filename):
 # RUTAS
 
 # CRUD - INICIO - 1. Página de Inicio.
-
-
-@app.route("/", methods=["GET"])
-def home():
-    return "<h1> Hello There </h1>"
+# @app.route("/", methods=["GET"])
+# def home():
+#     return "<h1> Hello There </h1>"
 
 
 # CRUD - USER - 2. Iniciar sesión un nuevo usuario ya registrado.
@@ -96,15 +95,17 @@ def register():
 
 # CRUD - USER - 4. Editar perfil del usuario.
 # @app.route("/editProfile/<int:id>", methods=["PUT"])
-@app.route("/editProfile", methods=["PUT"])
+@app.route("/put", methods=["PUT"])
 @jwt_required()
-def editProfile():
+def put():
     # Aquí se leen los parametros del request y se accede al query params id
     id = request.args.get('id')
     if id is not None:
         user = User.query.filter_by(id=id).first()
         if user is not None:
             user.name = request.json.get("name")
+#           user.bio = request.json.get("bio")
+#           user.email = request.json.get("email")
             user.password = bcrypt.generate_password_hash(
                 request.json.get("password"))
 
@@ -119,30 +120,54 @@ def editProfile():
             "msg": "El perfil de TU USUARIO no existe o no esta registrado "
         }), 400
 
+    """
+    user = request.user
+    serializer = UserSerializerWithToken(user, many=False)
+    data = request.data
+    user.user_name = data['user_name']
+    user.bio = data['bio']
+    user.email = data['email']
+    if data['password'] != '':
+        user.password = make_password(data['password'])
+    user.save()
+    return Response(serializer.data)
+    """
 
 # CRUD - USER - 5. Subir imagen del usuario.
-@app.route("/upload_image/<int:id>", methods=["POST"])
+@app.route("/image/<int:id>", methods=["POST"])
 @jwt_required()
 def uploadImage(id):
-    if "file" not in request.files:
-        return jsonify({"msg": "La consulta de 'File' no ha sido solicitada."})
-    file = request.files["file"]
-    if file.filename == "":
-        return jsonify({"msg": "El archivo 'file' no contiene un nombre."})
-    filename = secure_filename(file.filename)
-    file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-    return jsonify({"msg": "La imagen ha sido guardada."})
+    data = request.data
+    user_id = data['user_id']
+    user = User.objects.get(id=user_id)
+    user.image = request.FILES.get('image')
+    user.save()
+    return jsonify('Subiste tu imagen!')
+    
+    # if "file" not in request.files:
+    #     return jsonify({"msg": "La consulta de 'File' no ha sido solicitada."})
+    # file = request.files["file"]
+    # if file.filename == "":
+    #     return jsonify({"msg": "El archivo 'file' no contiene un nombre."})
+    # filename = secure_filename(file.filename)
+    # file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+    # return jsonify({"msg": "La imagen ha sido guardada."})
 
 
 # CRUD - USER - 6. Ver perfil personal del usuario.
-@app.route("/miPerfil", methods=["GET"])
+@app.route("/userProfile", methods=["GET"])
 @jwt_required()
 def getUserProfile():
-    email = get_jwt_identity()
-    user = User.query.filter_by(email=email).first()
-    return jsonify({
-        "user": user.serialize()
-    }), 200
+    user = request.user
+    serializer = UserSerializer(user, many=False)
+    return jsonify(serializer.data)
+    
+    
+#    email = get_jwt_identity()
+#    user = User.query.filter_by(email=email).first()
+#    return jsonify({
+#        "user": user.serialize()
+#    }), 200
 
     """
     userProfile = userProfile.query.filter_by(id=id).first()
@@ -153,26 +178,34 @@ def getUserProfile():
 # CRUD - USER - 7. Ver lista completa de publicaciones del usuario.
 
 
-@app.route("/getSoloUser/<int:id>", methods=["GET"])  # posts
+@app.route("/<int:id>", methods=["GET"])  # posts
 @jwt_required()
 def getSoloUser(id):
-    all_posts = Post.query.filter_by(id=id).first()
-    all_posts = list(map(lambda post: post.serialize(), all_posts))
-    if all_posts is not None:
-        return jsonify(all_posts.serialize())
+    user = User.objects.get(id=id)
+    serializer = UserSerializer(user, many=False)
+    return jsonify(serializer.data)
+    
+    # all_posts = Post.query.filter_by(id=id).first()
+    # all_posts = list(map(lambda post: post.serialize(), all_posts))
+    # if all_posts is not None:
+    #     return jsonify(all_posts.serialize())
 
 
 # CRUD - USER - 8. Ver lista completa de usuarios.
 @app.route("/getUsers", methods=["GET"])
 @jwt_required()
 def getUsers(id):
-    try:
-        all_users = User.query.all()
-        all_users = list(
-            map(lambda editdata: user.serialize(), all_users))
-    except Exception as error:
-        print("Editar error : {error}")
-    return jsonify(all_users)
+    users = User.objects.all()
+    serializer = UserSerializer(users, many=True)
+    return jsonify(serializer.data)
+
+    # try:
+    #     all_users = User.query.all()
+    #     all_users = list(
+    #         map(lambda editdata: user.serialize(), all_users))
+    # except Exception as error:
+    #     print("Editar error : {error}")
+    # return jsonify(all_users)
 
 
 """
@@ -186,118 +219,167 @@ def blogUsers():
         "data": all_users
     })
 """
+#CRUD -BLOG - 09. Ver lista general de publicaciones.
+@app.route("/get", methods=["GET"])
+@jwt_required()
+def getBlogs():
+    blog = Blog.objects.filter().order_by('-date')
+    serializer = BlogSerializer(blog, many=True)
+    return jsonify(serializer.data)
+
 
 # CRUD - BLOG - 10. Ver lista completa de publicaciones de tu perfil.
-
-
 @app.route("/soloBlog/<int:id>", methods=["GET"])
 @jwt_required()
-def soloBlogs():
-    all_blogs = Post.query.get_all()
-    all_blogs = list(map(lambda post: post.serialize(), all_blogs))
-    return jsonify({
-        "data": all_blogs
-    })
+def getsoloBlog():
+    blog = Blog.objects.get(id=id)
+    serializer = BlogSerializer(blog, many=False)
+    return jsonify(serializer.data)
+
+    # all_blogs = Post.query.get_all()
+    # all_blogs = list(map(lambda post: post.serialize(), all_blogs))
+    # return jsonify({
+    #     "data": all_blogs
+    # })
+
 
 # CRUD - BLOG - 11. Comentar una publicación.
-
-
-@app.route("/addBlog/<int:id>", methods=["GET", "POST"])
+@app.route("/addBlog/<int:id>", methods=["POST"]) #además de GET
 @jwt_required()
-def addBlog():
-    if request.method == 'POST':
-        title = request.form.get('title')
-        post = request.form.get('comentary')
-        date = request.form.get('date')
+def postBlog():
+    data = request.data
+    blog = Blog.objects.create(
+        user=request.user,
+        body=data['body'],
+    )
+    serializer = BlogSerializer(blog, many=False)
+    return jsonify(serializer.data)
 
-        post = Post(g.user.id, title, post, date)
+    # if request.method == 'POST':
+    #     title = request.form.get('title')
+    #     post = request.form.get('comentary')
+    #     date = request.form.get('date')
 
-        error = None
-        if not title:
-            error = 'Se requiere un TITULO para esta publicación'
+    #     post = Post(g.user.id, title, post, date)
 
-        if error is not None:
-            flash(error)
+    #     error = None
+    #     if not title:
+    #         error = 'Se requiere un TITULO para esta publicación'
 
-        else:
-            db.session.add(post)
-            db.session.commit()
-            return post
+    #     if error is not None:
+    #         flash(error)
 
-        flash(error)
+    #     else:
+    #         db.session.add(post)
+    #         db.session.commit()
+    #         return post
 
-    return jsonify({
-        "msg": "El post de TU USUARIO ha sido encontrado publicada"
-    }), 200
+    #     flash(error)
+
+    # return jsonify({
+    #     "msg": "El post de TU USUARIO ha sido encontrado publicada"
+    # }), 200
 
 
-def get_post(id, check_author=True):
-    post = Post.query.get(id)
+# def get_post(id, check_author=True):
+#     post = Post.query.get(id)
 
-    if post is None:
-        abort(404, f'La {id} de la publicación NO EXIST.')
+#     if post is None:
+#         abort(404, f'La {id} de la publicación NO EXIST.')
 
-    if check_author and post.title != g.user.id:
-        abort(404)
+#     if check_author and post.title != g.user.id:
+#         abort(404)
 
-    return post
+#     return post
 
 
 # CRUD - BLOG - 12. Editar una publicación.
-@app.route("/editBlog/<int:id>", methods=["GET", "PUT"])
+@app.route("/editBlog/<int:id>", methods=["PUT"]) #ademas del GET
 @jwt_required()
-def editBlog(id):
+def putBlog(id):
+    data = request.data
+    blog = Blog.objects.get(id=id)
+    serializer = BlogSerializer(instance=blog, data=data)
+    if blog.user == request.user:
+        if serializer.is_valid():
+            serializer.save()
+    else:
+        return jsonify({'Error': 'No Autorizado'})
+    return jsonify(serializer.data)
 
-    post = get_post(id)
+    # post = get_post(id)
 
-    if request.method == 'PUT':
-        post.title = request.form.get('title')
-        post.post = request.form.get('post')
-        post.date = request.form.get('date')
+    # if request.method == 'PUT':
+    #     post.title = request.form.get('title')
+    #     post.post = request.form.get('post')
+    #     post.date = request.form.get('date')
 
-        error = None
-        if not post.title:
-            error = 'Se requiere un TITULO para esta publicación'
+    #     error = None
+    #     if not post.title:
+    #         error = 'Se requiere un TITULO para esta publicación'
 
-        if error is not None:
-            flash(error)
-        else:
-            db.session.add(post)
-            db.session.commit()
-            return post.post
+    #     if error is not None:
+    #         flash(error)
+    #     else:
+    #         db.session.add(post)
+    #         db.session.commit()
+    #         return post.post
 
-        flash(error)
+    #     flash(error)
 
-    return jsonify({
-        "msg": "La edición de este POST ha sido publicada"
-    }), 200
+    # return jsonify({
+    #     "msg": "La edición de este POST ha sido publicada"
+    # }), 200
 
 
 # CRUD - BLOG - 13. Eliminar una publicación.
 @app.route("/deletePost/<int:id>", methods=["DELETE"])
 @jwt_required()
 def deletePost(id):
-    post = get_post(id)
-    db.session.delete(post)
-    db.session.commit()
+    blog = Blog.objects.get(id=id)
+    if blog.user == request.user:
+        blog.delete()
+        return jsonify('El Blog ha sido eliminado')
+    else:
+        return jsonify({'Error': 'No Autorizado'})
+    
+    
+    # post = get_post(id)
+    # db.session.delete(post)
+    # db.session.commit()
 
-    return jsonify({
-        "msg": "Se elimino la PUBLICACIÓN de forma satisfactoria"
-    }), 200
+    # return jsonify({
+    #     "msg": "Se elimino la PUBLICACIÓN de forma satisfactoria"
+    # }), 200
 
 
 # CRUD - USER - 14. Eliminar la cuenta de un Usuario registrado
-@app.route("/deleteUser/<int:id>", methods=["DELETE"])
-@jwt_required()
-def deleteUser(id):
-    if id is not None:
-        user = User.query.filter_by(id=id).first()
-        db.session.delete(user)
-        db.session.commit()
-        return jsonify({"msg": "La eliminación de TU CUENTA se ha efectuado"})
-    else:
-        return jsonify({"msg": "TU CUENTA no ha sido encontrada"}), 404
+# @app.route("/deleteUser/<int:id>", methods=["DELETE"])
+# @jwt_required()
+# def deleteUser(id):
+#     if id is not None:
+#         user = User.query.filter_by(id=id).first()
+#         db.session.delete(user)
+#         db.session.commit()
+#         return jsonify({"msg": "La eliminación de TU CUENTA se ha efectuado"})
+#     else:
+#         return jsonify({"msg": "TU CUENTA no ha sido encontrada"}), 404
 
+# CRUD - BLOG -14. Comentar publicación de otra publicación
+@app.route("/comment/<int:id>", methods=["PUT"])
+@jwt_required()
+def comment(id):
+    blog = Blog.objects.get(id=id)
+    user = request.user
+    data = request.data
+    comment = Comment.objects.create(
+        user=user,
+        blog=blog,
+        text=data['text']
+    )
+    comments = blog.comment_set.all()
+    blog.save()
+    return jsonify('Haz posteado un comentario!')
 
 # CRUD - USER - 15. Salir sesión de un usuario logeado
 @app.route("/logout", methods=["GET"])

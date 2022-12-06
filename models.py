@@ -9,6 +9,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), nullable=False, unique=True)
+    bio = db.Column(db.String(50), nullable=False)
+    image = db.Column(db.ImageField, nullable=False)                                ######################
     password = db.Column(db.String(50), nullable=False, unique=False)
     #post = db.relationship("Post")
 
@@ -20,40 +22,40 @@ class User(db.Model):
             "id": self.id,
             "username": self.name,
             "email": self.email,
-            #"password": self.password,
+            "bio": self.bio,
+            "image": self.image
+            # "password": self.password,
         }
 
 
-"""class Blog(db.Model):
+class Blog(db.Model):
     __tablename__ = "blogs"
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(50), nullable=False)
-    comentary = db.Column(db.String(100), nullable=False)
+    body = db.Column(db.String(200), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    posts = db.relantioship("Post")
+    date = db.Column(db.DateTimeField, nullable=False, default=datetime.utcnow)
+    posts = db.relantioship("Comment")
 
     def _repr_(self):
-        return "<Product %r>" % self.title
+        return "<Product %r>" % self.body                              ##############################
 
     def serialize(self):
         return {
             "id": self.id,
-            "title": self.title,
-            "comentary": self.comentary,
-            "user_id": self.user_id
+            "body": self.body,
+            "user_id": self.user_id,
+            "date": self.date
         }
-"""
 
 
-class Post(db.Model):
-    __tablename__ = "posts"
+class Comment(db.Model):
+    __tablename__ = "comments"
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
-    post = db.Column(db.String(300), nullable=False)
-    date = db.Column(db.DateTime(20), nullable=False, default=datetime.utcnow)
+    blog = db.Column(db.String(100), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    #blog_id = db.Column(db.Interger, db.ForeignKey("blogs.id"), nullable=False)
-    user = db.relationship("User")
+    text = db.Column(db.String(300), nullable=False)
+    date = db.Column(db.DateTime(20), nullable=False, default=datetime.utcnow)
+    user = db.relationship("Blog")
 
     def _repr_(self):
         return "<Post %r>" % self.title
@@ -61,9 +63,8 @@ class Post(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "title": self.title,
-            "comentary": self.post,
-            "date": self.date,
-            "user_id": self.user_id
-            # "blog_id": self.blog_id
+            "blog": self.blog,
+            "user_id": self.user_id,
+            "text": self.text,
+            "date": self.date
         }
