@@ -172,6 +172,7 @@ def getSoloUser(id):
 
 # CRUD - USER - 8. Ver lista completa de usuarios.
 @app.route("/getUsers", methods=["GET"])
+# @jwt_required()
 def get_users():
     try:
         all_users = User.query.all()
@@ -186,6 +187,14 @@ def get_users():
 @app.route("/blogs/getAll", methods=["GET"])
 # @jwt_required()
 def blogsGetAll():
+    try:
+        all_blogs = Post.query.all()
+        all_blogs = list(
+            map(lambda blogsGetAll: blogsGetAll.serialize(), all_blogs))
+    except Exception as error:
+        print("Editar error : {error}")
+    return jsonify(all_blogs)
+
     # email = request.json.get("email")
     print('holi')
     # found_user = User.query.filter_by(email=email).first()
@@ -197,9 +206,8 @@ def blogsGetAll():
         "data": 'blogs'
     })
 
+
 # CRUD - BLOG - 10. Ver lista completa de publicaciones de tu perfil.
-
-
 @app.route("/blogs/get/<int:id>", methods=["GET"])
 @jwt_required()
 def soloBlogs():
@@ -210,7 +218,6 @@ def soloBlogs():
     })
 
 # CRUD - BLOG - 11. Comentar una publicación.
-
 
 @app.route("/post", methods=["GET", "POST"])
 @jwt_required()
