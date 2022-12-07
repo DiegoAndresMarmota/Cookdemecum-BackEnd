@@ -34,7 +34,7 @@ jwt = JWTManager(app)
 
 def allowed_file(filename):
     return '.' in filename and \
-    filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # RUTAS
 
@@ -96,9 +96,9 @@ def register():
 
 # CRUD - USER - 4. Editar perfil del usuario.
 # @app.route("/editProfile/<int:id>", methods=["PUT"])
-@app.route("/editProfile", methods=["PUT"])
+@app.route("/put", methods=["PUT"])
 @jwt_required()
-def editProfile():
+def edit_profile():
     # Aquí se leen los parametros del request y se accede al query params id
     id = request.args.get('id')
     if id is not None:
@@ -121,9 +121,9 @@ def editProfile():
 
 
 # CRUD - USER - 5. Subir imagen del usuario.
-@app.route("/upload_image/<int:id>", methods=["POST"])
+@app.route("/image", methods=["POST"])
 @jwt_required()
-def uploadImage(id):
+def upload_image(id):
     if "file" not in request.files:
         return jsonify({"msg": "La consulta de 'File' no ha sido solicitada."})
     file = request.files["file"]
@@ -135,14 +135,14 @@ def uploadImage(id):
 
 
 # CRUD - USER - 6. Ver perfil personal del usuario.
-@app.route("/miPerfil", methods=["GET"])
+@app.route("/userProfile", methods=["GET"])
 @jwt_required()
-def getUserProfile():
+def get_user_profile():
     email = get_jwt_identity()
     user = User.query.filter_by(email=email).first()
     return jsonify({
         "user": user.serialize()
-    }), 200
+    })
 
     """
     userProfile = userProfile.query.filter_by(id=id).first()
@@ -153,7 +153,7 @@ def getUserProfile():
 # CRUD - USER - 7. Ver lista completa de publicaciones del usuario.
 
 
-@app.route("/getSoloUser/<int:id>", methods=["GET"])  # posts
+@app.route("/<int:id>", methods=["GET"])  # posts
 @jwt_required()
 def getSoloUser(id):
     all_posts = Post.query.filter_by(id=id).first()
@@ -164,12 +164,11 @@ def getSoloUser(id):
 
 # CRUD - USER - 8. Ver lista completa de usuarios.
 @app.route("/getUsers", methods=["GET"])
-@jwt_required()
-def getUsers(id):
+def get_users():
     try:
         all_users = User.query.all()
         all_users = list(
-            map(lambda editdata: user.serialize(), all_users))
+            map(lambda getusers: getusers.serialize(), all_users))
     except Exception as error:
         print("Editar error : {error}")
     return jsonify(all_users)
@@ -190,7 +189,7 @@ def blogUsers():
 # CRUD - BLOG - 10. Ver lista completa de publicaciones de tu perfil.
 
 
-@app.route("/soloBlog/<int:id>", methods=["GET"])
+@app.route("/get/<int:id>", methods=["GET"])
 @jwt_required()
 def soloBlogs():
     all_blogs = Post.query.get_all()
@@ -202,7 +201,7 @@ def soloBlogs():
 # CRUD - BLOG - 11. Comentar una publicación.
 
 
-@app.route("/addBlog/<int:id>", methods=["GET", "POST"])
+@app.route("/post", methods=["GET", "POST"])
 @jwt_required()
 def addBlog():
     if request.method == 'POST':
@@ -244,7 +243,7 @@ def get_post(id, check_author=True):
 
 
 # CRUD - BLOG - 12. Editar una publicación.
-@app.route("/editBlog/<int:id>", methods=["GET", "PUT"])
+@app.route("/put/<int:id>", methods=["GET", "PUT"])
 @jwt_required()
 def editBlog(id):
 
@@ -274,7 +273,7 @@ def editBlog(id):
 
 
 # CRUD - BLOG - 13. Eliminar una publicación.
-@app.route("/deletePost/<int:id>", methods=["DELETE"])
+@app.route("/delete/<int:id>", methods=["DELETE"])
 @jwt_required()
 def deletePost(id):
     post = get_post(id)
@@ -286,17 +285,17 @@ def deletePost(id):
     }), 200
 
 
-# CRUD - USER - 14. Eliminar la cuenta de un Usuario registrado
-@app.route("/deleteUser/<int:id>", methods=["DELETE"])
-@jwt_required()
-def deleteUser(id):
-    if id is not None:
-        user = User.query.filter_by(id=id).first()
-        db.session.delete(user)
-        db.session.commit()
-        return jsonify({"msg": "La eliminación de TU CUENTA se ha efectuado"})
-    else:
-        return jsonify({"msg": "TU CUENTA no ha sido encontrada"}), 404
+# # CRUD - USER - 14. Eliminar la cuenta de un Usuario registrado
+# @app.route("/deleteUser/<int:id>", methods=["DELETE"]) ###"/registro/<int:id>"
+# @jwt_required()
+# def deleteUser(id):
+#     if id is not None:
+#         user = User.query.filter_by(id=id).first()
+#         db.session.delete(user)
+#         db.session.commit()
+#         return jsonify({"msg": "La eliminación de TU CUENTA se ha efectuado"})
+#     else:
+#         return jsonify({"msg": "TU CUENTA no ha sido encontrada"}), 404
 
 
 # CRUD - USER - 15. Salir sesión de un usuario logeado
@@ -340,4 +339,4 @@ def user():
 
 # Configuración Servidor
 if __name__ == "__main__":
-    app.run(port=8080, host="localhost")
+    app.run(host="localhost", port="8000")
