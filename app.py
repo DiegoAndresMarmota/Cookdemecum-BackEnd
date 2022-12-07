@@ -53,6 +53,7 @@ def login():
     password = request.json.get("password")
 
     found_user = User.query.filter_by(email=email).first()
+    print(found_user)
 
     if found_user is None:
         return jsonify({
@@ -77,14 +78,21 @@ def login():
 @app.route("/register", methods=["POST"])
 def register():
     # if request.method == 'POST':
-    name = request.json.get("name")
+    name = request.json.get("user_name")
     email = request.json.get("email")
+    password = request.json.get("password")
+    print(name, email, password)
+
+    found_user = User.query.filter_by(email=email).first()
+    if found_user is not None:
+        return jsonify({
+            "msg": "El USUARIO ya existe. Favor, crear un nuevo USUARIO"
+        }), 200
 
     new_contact = User()
     new_contact.name = name
     new_contact.email = email
-    new_contact.password = bcrypt.generate_password_hash(
-        request.json.get("password"))
+    new_contact.password = bcrypt.generate_password_hash(password)
 
     db.session.add(new_contact)
     db.session.commit()
@@ -174,22 +182,25 @@ def get_users():
     return jsonify(all_users)
 
 
-"""
 # CRUD - BLOG - 9. Ver lista completa de publicaciones de los usuarios.
-@app.route("/blogUsers", methods=["GET"])
-@jwt_required()
-def blogUsers():
-    all_users = User.query.get_all()
-    all_users = list(map(lambda user: user.serialize(), all_users))
+@app.route("/blogs/getAll", methods=["GET"])
+# @jwt_required()
+def blogsGetAll():
+    # email = request.json.get("email")
+    print('holi')
+    # found_user = User.query.filter_by(email=email).first()
+    # blogs = blogs.query.get_all() # Traer todos los blogs del usuario encontrado
+    # print(blogs)
+
+    # all_users = list(map(lambda user: user.serialize(), all_users))
     return jsonify({
-        "data": all_users
+        "data": 'blogs'
     })
-"""
 
 # CRUD - BLOG - 10. Ver lista completa de publicaciones de tu perfil.
 
 
-@app.route("/get/<int:id>", methods=["GET"])
+@app.route("/blogs/get/<int:id>", methods=["GET"])
 @jwt_required()
 def soloBlogs():
     all_blogs = Post.query.get_all()
