@@ -222,29 +222,30 @@ def soloBlogs():
 
 
 # CRUD - BLOG - 11. Comentar una publicación.
-@app.route("/post", methods=["GET", "POST"])
+@app.route("/post", methods=["POST"])
 @jwt_required()
 def addBlog():
-    if request.method == 'POST':
-        title = request.form.get('title')
-        post = request.form.get('comentary')
-        date = request.form.get('date')
+    user_id = request.json.get('user_id')
+    title = request.json.get('title')
+    post = request.json.get('comentary')
 
-        post = Post(g.user.id, title, post, date)
+    if not title:
+        return jsonify({
+            "msg": "Se requiere un TITULO para esta publicación"
+        })
 
-        error = None
-        if not title:
-            error = 'Se requiere un TITULO para esta publicación'
+    if not post:
+        return jsonify({
+            "msg": "Se requiere un COMENTARIO para esta publicación"
+        })
 
-        if error is not None:
-            flash(error)
+    new_post = Post()
+    new_post.user_id = user_id
+    new_post.title = title
+    new_post.post = post
 
-        else:
-            db.session.add(post)
-            db.session.commit()
-            return post
-
-        flash(error)
+    db.session.add(new_post)
+    db.session.commit()
 
     return jsonify({
         "msg": "El post de TU USUARIO ha sido encontrado publicada"
@@ -383,4 +384,4 @@ def user():
 
 # Configuración Servidor
 if __name__ == "__main__":
-    app.run(host="localhost", port="8080")
+    app.run(host="localhost", port="8080", debug=True)
