@@ -23,28 +23,6 @@ class User(db.Model):
             #"password": self.password,
         }
 
-
-"""class Blog(db.Model):
-    __tablename__ = "blogs"
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(50), nullable=False)
-    comentary = db.Column(db.String(100), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    posts = db.relantioship("Post")
-
-    def _repr_(self):
-        return "<Product %r>" % self.title
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "title": self.title,
-            "comentary": self.comentary,
-            "user_id": self.user_id
-        }
-"""
-
-
 class Post(db.Model):
     __tablename__ = "posts"
     id = db.Column(db.Integer, primary_key=True)
@@ -67,3 +45,26 @@ class Post(db.Model):
             "user_id": self.user_id
             # "blog_id": self.blog_id
         }
+
+###### Crear Blog que dependa de Post
+###### Para que se pueda comentar en las publicaciones ya creadas
+
+"""class Blog(db.Model):
+    __tablename__ = "blogs"
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(50), nullable=False)
+    comentary = db.Column(db.String(100), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    posts = db.relantioship("Post")
+
+    def _repr_(self):
+        return "<Product %r>" % self.title
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "comentary": self.comentary,
+            "user_id": self.user_id
+        }
+"""

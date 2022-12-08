@@ -158,9 +158,8 @@ def get_user_profile():
     return jsonify(userProfile.serialize), 200
     """
 
+
 # CRUD - USER - 7. Ver lista completa de publicaciones del usuario.
-
-
 @app.route("/<int:id>", methods=["GET"])  # posts
 @jwt_required()
 def getSoloUser(id):
@@ -217,8 +216,8 @@ def soloBlogs():
         "data": all_blogs
     })
 
-# CRUD - BLOG - 11. Comentar una publicación.
 
+# CRUD - BLOG - 11. Comentar una publicación.
 @app.route("/post", methods=["GET", "POST"])
 @jwt_required()
 def addBlog():
@@ -301,6 +300,29 @@ def deletePost(id):
     return jsonify({
         "msg": "Se elimino la PUBLICACIÓN de forma satisfactoria"
     }), 200
+
+
+# # CRUD -BLOG -14. Añadir un comentario a una publicación.
+# @app.route("/comment/<int:id>", methods=["POST"])
+# @jwt_required()
+# def comment_post(id):
+#     found_post = Post.query.filter_by(id=id).first()
+#     if found_post is not None:
+#         return jsonify({
+#             "msg": "La publicación no existe."
+#         }), 200
+
+#     new_comment = Blog()
+#     new_comment.title = title
+#     new_comment.comentary = comentary
+
+
+#     db.session.add(new_comment)
+#     db.session.commit()
+
+#     flash('El comentario a la publicación ha sido realizado')
+
+#     return jsonify({"msg": "Comentario publicado."})
 
 
 # # CRUD - USER - 14. Eliminar la cuenta de un Usuario registrado
