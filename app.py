@@ -58,7 +58,7 @@ def login():
     if found_user is None:
         return jsonify({
             "msg": "El USUARIO no ha sido encontrado. Favor, crear un nuevo USUARIO"
-        }), 404
+        }), 401
 
     else:
         if bcrypt.check_password_hash(found_user.password, password):
@@ -87,7 +87,7 @@ def register():
     if found_user is not None:
         return jsonify({
             "msg": "El USUARIO ya existe. Favor, crear un nuevo USUARIO"
-        }), 200
+        }), 401
 
     new_contact = User()
     new_contact.name = name
@@ -97,9 +97,13 @@ def register():
     db.session.add(new_contact)
     db.session.commit()
 
-    flash('Usuario registrado satisfactoriamente')
-
-    return jsonify({"msg": "Usuario registrado satisfactoriamente."})
+    found_user = User.query.filter_by(email=email).first()
+    access_token = create_access_token(identity=email)
+    return jsonify({
+        "access_token": access_token,
+        "data": found_user.serialize(),
+        "success": True
+    }), 200
 
 
 # CRUD - USER - 4. Editar perfil del usuario.
