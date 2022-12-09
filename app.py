@@ -286,6 +286,22 @@ def deletePost(id):
         "msg": "Se elimino la PUBLICACIÓN de forma satisfactoria"
     }), 200
 
+# CRUD - BLOG - 12. Editar una publicación.
+
+
+@app.route("/blogs/<int:id>", methods=["GET"])
+@jwt_required()
+def getBlog(id):
+    if id is None:
+        return jsonify({
+            "msg": "Se requiere un POST ID para ver esta publicación"
+        }), 401
+
+    post = get_post(id)
+
+    return jsonify({
+        "msg": post.serialize()
+    }), 200
 
 # # CRUD -BLOG -14. Añadir un comentario a una publicación.
 # @app.route("/comment/<int:id>", methods=["POST"])
