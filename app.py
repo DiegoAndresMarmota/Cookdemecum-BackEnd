@@ -193,7 +193,7 @@ def get_users():
 def blogsGetAll():
     try:
         userId = request.headers.get('user_id')
-        
+
         all_blogs = Post.query.filter_by(user_id=userId)
         all_blogs = list(
             map(lambda blogsGetAll: blogsGetAll.serialize(), all_blogs))
@@ -245,43 +245,32 @@ def addBlog():
 
 
 def get_post(id, check_author=True):
-    post = Post.query.get(id)
+    post = Post.query.filter_by(id=id).first()
 
     if post is None:
         abort(404, f'La {id} de la publicación NO EXIST.')
-
-    if check_author and post.title != g.user.id:
-        abort(404)
 
     return post
 
 
 # CRUD - BLOG - 12. Editar una publicación.
-@app.route("/put/<int:id>", methods=["PUT"])
+@app.route("/blogs/editBlog/<int:id>", methods=["PUT"])
 @jwt_required()
 def editBlog(id):
+    newPost = request.json.get('post')
+
+    if newPost is None:
+        return jsonify({
+            "msg": "Se requiere  un UserId o POST para actualizar esta publicación"
+        }), 401
+
     post = get_post(id)
 
-    if request.method == 'PUT':
-        post.title = request.form.get('title')
-        post.post = request.form.get('post')
-        post.date = request.form.get('date')
-
-        error = None
-        if not post.title:
-            error = 'Se requiere un TITULO para esta publicación'
-
-        if error is not None:
-            flash(error)
-        else:
-            db.session.add(post)
-            db.session.commit()
-            return post.post
-
-        flash(error)
+    post.post = newPost
+    db.session.commit()
 
     return jsonify({
-        "msg": "La edición de este POST ha sido publicada"
+        "msg": "La edición de este POST ha sido realizada"
     }), 200
 
 
