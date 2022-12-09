@@ -178,7 +178,8 @@ def getSoloUser(id):
 # @jwt_required()
 def get_users():
     try:
-        all_users = User.query.filter_by(user_id=id)
+        #all_users = User.query.filter_by(user_id=id)
+        all_users = User.query.all()
         all_users = list(
             map(lambda getusers: getusers.serialize(), all_users))
     except Exception as error:
@@ -191,7 +192,8 @@ def get_users():
 # @jwt_required()
 def blogsGetAll():
     try:
-        all_blogs = Post.query.filter_by(user_id=id)
+        #all_users = User.query.filter_by(user_id=id)
+        all_blogs = Post.query.all()
         all_blogs = list(
             map(lambda blogsGetAll: blogsGetAll.serialize(), all_blogs))
     except Exception as error:
@@ -268,69 +270,42 @@ def get_post(id, check_author=True):
 @app.route("/put/<int:id>", methods=["PUT"])
 @jwt_required()
 def editBlog(id):
-    user_id = request.json.get('user_id')
-    title = request.json.get('title')
-    post = request.json.get('comentary')
-    
-    edit_post = Post.query.filter_by(user_id=id)
+    post = get_post(id)
 
-    edit_post = Post()
-    edit_post.user_id = user_id
-    edit_post.title = title
-    edit_post.post = post
+    if request.method == 'PUT':
+        post.title = request.form.get('title')
+        post.post = request.form.get('post')
+        post.date = request.form.get('date')
 
-    db.session.add(edit_post)
-    db.session.commit()
+        error = None
+        if not post.title:
+            error = 'Se requiere un TITULO para esta publicación'
+
+        if error is not None:
+            flash(error)
+        else:
+            db.session.add(post)
+            db.session.commit()
+            return post.post
+
+        flash(error)
 
     return jsonify({
-        "msg": "El post de TU USUARIO ha sido encontrado editado."
+        "msg": "La edición de este POST ha sido publicada"
     }), 200
-
-    # post = get_post(id)
-
-    # if request.method == 'PUT':
-    #     post.title = request.form.get('title')
-    #     post.post = request.form.get('post')
-    #     post.date = request.form.get('date')
-
-    #     error = None
-    #     if not post.title:
-    #         error = 'Se requiere un TITULO para esta publicación'
-
-    #     if error is not None:
-    #         flash(error)
-    #     else:
-    #         db.session.add(post)
-    #         db.session.commit()
-    #         return post.post
-
-    #     flash(error)
-
-    # return jsonify({
-    #     "msg": "La edición de este POST ha sido publicada"
-    # }), 200
 
 
 # CRUD - BLOG - 13. Eliminar una publicación.
 @app.route("/delete/<int:id>", methods=["DELETE"])
 @jwt_required()
 def deletePost(id):
-    delete_id = User.query.get(id)
-    db.session.delete(delete_id)
+    post = get_post(id)
+    db.session.delete(post)
     db.session.commit()
-    
+
     return jsonify({
         "msg": "Se elimino la PUBLICACIÓN de forma satisfactoria"
-        }), 200
-    
-    
-    # post = get_post(id)
-    # db.session.delete(post)
-    # db.session.commit()
-
-    # return jsonify({
-    #     "msg": "Se elimino la PUBLICACIÓN de forma satisfactoria"
-    # }), 200
+    }), 200
 
 
 # # CRUD -BLOG -14. Añadir un comentario a una publicación.
