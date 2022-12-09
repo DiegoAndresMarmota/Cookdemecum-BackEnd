@@ -275,7 +275,7 @@ def editBlog(id):
 
 
 # CRUD - BLOG - 13. Eliminar una publicación.
-@app.route("/delete/<int:id>", methods=["DELETE"])
+@app.route("/blogs/delete/<int:id>", methods=["DELETE"])
 @jwt_required()
 def deletePost(id):
     post = get_post(id)
