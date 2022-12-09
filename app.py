@@ -189,27 +189,17 @@ def get_users():
 
 # CRUD - BLOG - 9. Ver lista completa de publicaciones de los usuarios.
 @app.route("/blogs/getAll", methods=["GET"])
-# @jwt_required()
+@jwt_required()
 def blogsGetAll():
     try:
-        #all_users = User.query.filter_by(user_id=id)
-        all_blogs = Post.query.all()
+        userId = request.headers.get('user_id')
+        
+        all_blogs = Post.query.filter_by(user_id=userId)
         all_blogs = list(
             map(lambda blogsGetAll: blogsGetAll.serialize(), all_blogs))
     except Exception as error:
-        print("Editar error : {error}")
+        print("Error : {error}")
     return jsonify(all_blogs)
-
-    # email = request.json.get("email")
-    print('holi')
-    # found_user = User.query.filter_by(email=email).first()
-    # blogs = blogs.query.get_all() # Traer todos los blogs del usuario encontrado
-    # print(blogs)
-
-    # all_users = list(map(lambda user: user.serialize(), all_users))
-    return jsonify({
-        "data": 'blogs'
-    })
 
 
 # CRUD - BLOG - 10. Ver lista completa de publicaciones de tu perfil.
