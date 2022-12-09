@@ -261,7 +261,7 @@ def editBlog(id):
 
     if newPost is None:
         return jsonify({
-            "msg": "Se requiere  un UserId o POST para actualizar esta publicación"
+            "msg": "Se requiere POST para actualizar esta publicación"
         }), 401
 
     post = get_post(id)
