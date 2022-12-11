@@ -20,8 +20,9 @@ class User(db.Model):
             "id": self.id,
             "username": self.name,
             "email": self.email,
-            #"password": self.password,
+            # "password": self.password,
         }
+
 
 class Post(db.Model):
     __tablename__ = "posts"
@@ -30,6 +31,7 @@ class Post(db.Model):
     post = db.Column(db.String(300), nullable=False)
     date = db.Column(db.DateTime(20), nullable=False, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    img = db.Column(db.Text, nullable=False)
     #blog_id = db.Column(db.Interger, db.ForeignKey("blogs.id"), nullable=False)
     user = db.relationship("User")
 
@@ -42,12 +44,14 @@ class Post(db.Model):
             "title": self.title,
             "comentary": self.post,
             "date": self.date,
-            "user_id": self.user_id
+            "user_id": self.user_id,
+            "img": self.img
             # "blog_id": self.blog_id
         }
 
-###### Crear Blog que dependa de Post
-###### Para que se pueda comentar en las publicaciones ya creadas
+# Crear Blog que dependa de Post
+# Para que se pueda comentar en las publicaciones ya creadas
+
 
 """class Blog(db.Model):
     __tablename__ = "blogs"
