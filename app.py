@@ -213,13 +213,16 @@ def soloBlogs():
     })
 
 
-# CRUD - BLOG - 11. Comentar una publicación.
+# CRUD - BLOG - 11. Crear una publicación.
 @app.route("/post", methods=["POST"])
 @jwt_required()
 def addBlog():
     user_id = request.json.get('user_id')
     title = request.json.get('title')
     post = request.json.get('comentary')
+    img = request.json.get('imgPost')
+
+    # print(user_id, title, post, img)
 
     if not title:
         return jsonify({
@@ -235,6 +238,7 @@ def addBlog():
     new_post.user_id = user_id
     new_post.title = title
     new_post.post = post
+    new_post.img = img
 
     db.session.add(new_post)
     db.session.commit()
